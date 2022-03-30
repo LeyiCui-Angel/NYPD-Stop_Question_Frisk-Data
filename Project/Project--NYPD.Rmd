@@ -1,0 +1,34 @@
+---
+title: "Project-NYPD"
+author: "Leyi Cui, Qianhui Li"
+date: "3/29/2022"
+output: html_document
+---
+
+```{r}
+NYPD <- read.csv("Data/2018_sqf_database-abbr.csv")
+install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+# the number of stops in each month in the year 2018
+# MONTH2: categorical variable
+reorder_month <- c("January","February","March","April","May","June","July","August","September","October","November","December")
+NYPD$MONTH2 = factor(NYPD$MONTH2,levels=reorder_month)
+ggplot(NYPD, aes(MONTH2)) + geom_bar(alpha=0.90, colour="orange", fill="orange",width=0.75) + labs(title="", y="number of stops", x="month")
+
+```
+
+```{r}
+max(NYPD$OBSERVED_DURATION_MINUTES)
+length(NYPD[NYPD$OBSERVED_DURATION_MINUTES>20,"OBSERVED_DURATION_MINUTES"])
+mean(NYPD$OBSERVED_DURATION_MINUTES)
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "blue", fill = "white")
+ggplot(NYPD, aes(STOP_DURATION_MINUTES)) + geom_histogram(binwidth = 0.10, colour = "blue", fill = "white", bins = 15)
+```
+
+```{r}
+
+```
