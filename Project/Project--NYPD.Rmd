@@ -18,7 +18,22 @@ library(ggplot2)
 reorder_month <- c("January","February","March","April","May","June","July","August","September","October","November","December")
 NYPD$MONTH2 = factor(NYPD$MONTH2,levels=reorder_month)
 ggplot(NYPD, aes(MONTH2)) + geom_bar(alpha=0.90, colour="orange", fill="orange",width=0.75) + labs(title="", y="number of stops", x="month")
+```
 
+```{r}
+# DAY2: Day when ppl are stopped
+```
+
+```{r}
+# Visualize: Stop Frisk Time: Time when ppl are stopped （清晨、深夜）
+```
+
+```{r}
+# male vs female: dataframe
+```
+
+```{r}
+# Observed duration minutes.
 ```
 
 ```{r}
@@ -30,5 +45,57 @@ ggplot(NYPD, aes(STOP_DURATION_MINUTES)) + geom_histogram(binwidth = 0.10, colou
 ```
 
 ```{r}
+# SUSPECTED_CRIME_DESCRIPTION
+```
 
+```{r}
+# FRISKED_FLAG into dataframe
+```
+
+```{r}
+# SEARCHED_FLAG into dataframe
+```
+
+```{r}
+# OFFICER_IN_UNIFORM_FLAG
+```
+
+```{r}
+# SUSPECT_ARRESTED_FLAG 比对
+```
+
+```{r}
+# SUSPECT_REPORTED_AGE
+```
+
+```{r}
+# SUSPECT_SEX
+```
+
+```{r}
+# SUSPECT_RACE_DESCRIPTION
+```
+
+```{r}
+# SUSPECT_HEIGHT
+```
+
+```{r}
+# SUSPECT_WEIGHT
+```
+
+```{r}
+# SUSPECT_BODY_BUILD_TYPE
+```
+
+```{r}
+# SUSPECT_EYE_COLOR
+```
+
+```{r}
+# SUSPECT_HAIR_COLOR
+```
+
+```{r}
+# STOP_LOCATION_BORO_NAME
 ```
