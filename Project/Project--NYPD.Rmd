@@ -22,6 +22,10 @@ ggplot(NYPD, aes(MONTH2)) + geom_bar(alpha=0.90, colour="orange", fill="orange",
 
 ```{r}
 # DAY2: Day when ppl are stopped
+
+reorder_day <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+NYPD$DAY2 = factor(NYPD$DAY2,levels=reorder_day)
+ggplot(NYPD, aes(DAY2)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="number of stops", x="day")
 ```
 
 ```{r}
@@ -37,7 +41,8 @@ ggplot(NYPD, aes(MONTH2)) + geom_bar(alpha=0.90, colour="orange", fill="orange",
 ```
 
 ```{r}
-max(NYPD$OBSERVED_DURATION_MINUTES)
+outliers(NYPD$BSERVED_DURATION_MINUTES)
+
 length(NYPD[NYPD$OBSERVED_DURATION_MINUTES>20,"OBSERVED_DURATION_MINUTES"])
 mean(NYPD$OBSERVED_DURATION_MINUTES)
 ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "blue", fill = "white")
@@ -64,38 +69,110 @@ ggplot(NYPD, aes(STOP_DURATION_MINUTES)) + geom_histogram(binwidth = 0.10, colou
 # SUSPECT_ARRESTED_FLAG 比对
 ```
 
+
+
+```{r}
+# function1: variable X VS observe duration minutes (boxplots && scatterpoots)
+observe_time_relation <- function(m){
+  if(class(m) == "character"){
+  ggplot(NYPD, aes(x = m, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 2.5))
+}
+else{
+  ggplot(NYPD, aes(m, OBSERVED_DURATION_MINUTES)) + geom_point(outlier.shape = NA)
+}
+}
+
+
+# function2: variable X VS stop duration minutes (boxplots && scatterpoots)
+stop_time_relation <- function(n){
+  if(class(n) == "character"){
+  ggplot(NYPD, aes(x = n, y = STOP_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 20))
+}
+else{
+  ggplot(NYPD, aes(n, STOP_DURATION_MINUTES)) + geom_point()
+}
+}
+
+observe_time_relation(NYPD$SUSPECT_SEX)
+
+```
+
 ```{r}
 # SUSPECT_REPORTED_AGE
+# HOW TO REMOVE 0s??
+class(NYPD$SUSPECT_REPORTED_AGE)
+ggplot(NYPD,aes(SUSPECT_REPORTED_AGE)) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect reported age")
+
 ```
 
 ```{r}
 # SUSPECT_SEX
+class(NYPD$SUSPECT_SEX)
+ggplot(NYPD, aes(SUSPECT_SEX)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="count", x="suspect sex")
 ```
 
 ```{r}
 # SUSPECT_RACE_DESCRIPTION
+class(NYPD$SUSPECT_RACE_DESCRIPTION)
+ggplot(NYPD, aes(SUSPECT_RACE_DESCRIPTION)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.5) + labs(title="", y="count", x="suspect race description") + theme(axis.text.x=element_text(size=4.1))
 ```
 
 ```{r}
-# SUSPECT_HEIGHT
+# SUSPECT_HEIGHT 
+# we remove NAs here
+class(NYPD$SUSPECT_HEIGHT)
+max(NYPD$SUSPECT_HEIGHT,na.rm=TRUE)
+NYPD$SUSPECT_HEIGHT <- as.numeric(NYPD$SUSPECT_HEIGHT)
+ggplot(NYPD,aes(SUSPECT_HEIGHT),na.rm=TRUE) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect height")
+
+
+ggplot(NYPD, aes(SUSPECT_HEIGHT, OBSERVED_DURATION_MINUTES)) + geom_point(outlier.shape = NA) + coord_cartesian(ylim=c(0, 500))
 ```
 
 ```{r}
 # SUSPECT_WEIGHT
+# we remove NAs here
+class(NYPD$SUSPECT_WEIGHT)
+max(NYPD$SUSPECT_WEIGHT,na.rm=TRUE)
+NYPD$SUSPECT_WEIGHT <- as.numeric(NYPD$SUSPECT_WEIGHT)
+ggplot(NYPD,aes(SUSPECT_WEIGHT),na.rm=TRUE) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect weight")
 ```
 
 ```{r}
 # SUSPECT_BODY_BUILD_TYPE
+class(NYPD$SUSPECT_BODY_BUILD_TYPE)
+ggplot(NYPD, aes(SUSPECT_BODY_BUILD_TYPE)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect body build type")
 ```
 
 ```{r}
 # SUSPECT_EYE_COLOR
+unique(NYPD$SUSPECT_EYE_COLOR)
+ggplot(NYPD, aes(SUSPECT_EYE_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect eye color")
 ```
 
 ```{r}
 # SUSPECT_HAIR_COLOR
+unique(NYPD$SUSPECT_HAIR_COLOR)
+ggplot(NYPD, aes(SUSPECT_HAIR_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect hair color")
 ```
 
 ```{r}
 # STOP_LOCATION_BORO_NAME
+table(NYPD$STOP_LOCATION_BORO_NAME)
+ggplot(NYPD, aes(STOP_LOCATION_BORO_NAME)) + geom_bar(alpha=0.90, colour="orange3", fill="orange3",width=0.5) + labs(title="", y="count", x="stop borough")
+
+
+# To verify function1 and function2 //
+# Borough VS Stop Time
+mean(NYPD$STOP_DURATION_MINUTES)
+median(NYPD$STOP_DURATION_MINUTES)
+ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = STOP_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 20))
+
+# Borough VS Observe Time
+mean(NYPD$OBSERVED_DURATION_MINUTES)
+median(NYPD$OBSERVED_DURATION_MINUTES)
+ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 2.5))
+
+
+
 ```
