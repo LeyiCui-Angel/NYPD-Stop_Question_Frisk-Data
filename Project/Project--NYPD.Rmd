@@ -30,6 +30,22 @@ ggplot(NYPD, aes(DAY2)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",wi
 
 ```{r}
 # Visualize: Stop Frisk Time: Time when ppl are stopped （清晨、深夜）
+
+# Function: rounding(inputNum, totalNum)
+rounding <- function(inputNum, totalNum) {
+   m <- totalNum/2
+   if(inputNum < m){
+     # round down
+   }
+   else{
+     #round up
+   }
+}
+
+hour<-NYPD$Stop.Frisk.Time
+for(i in 1:length(hour)){
+  hourBefore <- substring(hour[i],4,5)
+}
 ```
 
 ```{r}
