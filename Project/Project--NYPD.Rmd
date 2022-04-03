@@ -34,19 +34,51 @@ ggplot(NYPD, aes(DAY2)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",wi
 
 ```{r}
 # male vs female: dataframe
+df_male_officer <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POM",]
+df_female_officer <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POF",]
+head(df_male_officer)
+head(df_female_officer)
+nrow(df_male_officer)
+nrow(df_female_officer)
 ```
 
 ```{r}
-# Observed duration minutes.
+
+
+# function: exclude outliers from the dataframe (only for numeric values); need to input a numeric vector
+
+exclude_outliers <- function(x){
+  Q1 <- quantile(x, .25)
+  Q3 <- quantile(x, .75)
+  IQR <- Q3-Q1
+  outlier <- x<Q1-1.5*IQR | x>Q3+1.5*IQR
+  clean_x <- x[!outlier]
+  return(clean_x)
+}
+ex_out <- exclude_outliers(NYPD$OBSERVED_DURATION_MINUTES)
+print(ex_out)
 ```
 
 ```{r}
-outliers(NYPD$BSERVED_DURATION_MINUTES)
+## Observed duration minutes.
 
-length(NYPD[NYPD$OBSERVED_DURATION_MINUTES>20,"OBSERVED_DURATION_MINUTES"])
-mean(NYPD$OBSERVED_DURATION_MINUTES)
-ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "blue", fill = "white")
-ggplot(NYPD, aes(STOP_DURATION_MINUTES)) + geom_histogram(binwidth = 0.10, colour = "blue", fill = "white", bins = 15)
+# Histogram --- Not excluded outliers
+ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (including outliers)", y="count", x="observed duration mins")
+
+# Histogram --- excluded outliers
+table(NYPD$OBSERVED_DURATION_MINUTES)
+ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,35,by=1), colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (excluding outliers)", y="count", x="observed duration mins")
+
+
+## Stop duration minutes.
+
+# Histogram --- Not excluded outliers
+ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(colour = "royalblue3", fill = "royalblue3",alpha=0.8) + labs(title="Distribution of Suspects' Stopped Duration Minutes (including outliers)", y="count", x="stop duration mins") 
+
+# Histogram --- excluded outliers
+table(NYPD$STOP_DURATION_MINUTES)
+ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,50,by=1), colour = "royalblue3", fill = "royalblue3",alpha=0.8) + labs(title="Distribution of Suspects' Stopped Duration Minutes (excluding outliers)", y="count", x="stop duration mins") 
+
 ```
 
 ```{r}
