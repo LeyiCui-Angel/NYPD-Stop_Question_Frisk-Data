@@ -63,6 +63,11 @@ ggplot(NYPD, aes(STOP_DURATION_MINUTES)) + geom_histogram(binwidth = 0.10, colou
 
 ```{r}
 # OFFICER_IN_UNIFORM_FLAG
+NYPD[NYPD$OFFICER_IN_UNIFORM_FLAG==0,"OFFICER_IN_UNIFORM_FLAG"] <- "not wearing uniform"
+NYPD[NYPD$OFFICER_IN_UNIFORM_FLAG==1,"OFFICER_IN_UNIFORM_FLAG"] <- "wearing uniform"
+table(NYPD$OFFICER_IN_UNIFORM_FLAG)
+ggplot(NYPD, aes(OFFICER_IN_UNIFORM_FLAG)) + geom_bar(alpha=0.90, colour="royalblue1", fill="royalblue1",width=0.75) + labs(title="", y="number of officers", x="officer in uniform")
+
 ```
 
 ```{r}
