@@ -128,7 +128,7 @@ p2 + geom_col() +
 ```{r}
 
 
-# function: exclude outliers from the dataframe (only for numeric values); need to input a numeric vector
+# function: calculate the bounds of a numeric variable; need to input a numeric vector
 
 bound <- function(x){
   Q1 <- quantile(x, .25)
@@ -143,7 +143,7 @@ bound <- function(x){
 ```{r}
 ## Observed duration minutes.
 
-# Histogram --- Not excluded outliers
+# Histogram --- Not excludes any values
 ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (including outliers)", y="count", x="observed duration mins")
 
 
@@ -155,10 +155,19 @@ bound(NYPD$OBSERVED_DURATION_MINUTES)
 ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,3.5,by=1), colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (excluding outliers)", y="count", x="observed duration mins")
 
 
+# Observed time: male VS female (excludes large numbers)
+df_pom_pof <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POM" | NYPD$ISSUING_OFFICER_RANK == "POF",]
+ggplot(df_pom_pof, aes(x = ISSUING_OFFICER_RANK, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35))
+
+# Observed time: male VS female (excludes outliers)
+ggplot(df_pom_pof, aes(x = ISSUING_OFFICER_RANK, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 3.5))
+
+
+
 
 ## Stop duration minutes.
 
-# Histogram --- Not excluded outliers
+# Histogram --- Not excludes any values
 ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(colour = "royalblue3", fill = "royalblue3",alpha=0.8) + labs(title="Distribution of Suspects' Stopped Duration Minutes (including outliers)", y="count", x="stop duration mins") 
 
 table(NYPD$STOP_DURATION_MINUTES)
@@ -167,6 +176,31 @@ ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,50,by=1), 
 # Histogram --- excludes outliers
 bound(NYPD$STOP_DURATION_MINUTES)
 ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,30,by=1), colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Stopped Duration Minutes (excluding outliers)", y="count", x="stop duration mins")
+
+
+# Stop time: male VS female (excludes large numbers)
+df_pom_pof <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POM" | NYPD$ISSUING_OFFICER_RANK == "POF",]
+ggplot(df_pom_pof, aes(x = ISSUING_OFFICER_RANK, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 50))
+
+# Stop time: male VS female (excludes outliers)
+ggplot(df_pom_pof, aes(x = ISSUING_OFFICER_RANK, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 30))
+
+
+
+## Relation between Observed Duration Minutes and Stop Duration Minutes 
+
+# Not excludes any values
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + labs(title="The Relation between Observed Time and Stop Time", subtitle="(with all data)", y="stop duration mins", x="observed duration mins")
+
+
+# excludes large numbers
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + coord_cartesian(xlim=c(0, 35), ylim=c(0, 50)) + labs(title="The Relation between Observed Time and Stop Time", subtitle="(excluding large numbers)", y="stop duration mins", x="observed duration mins")
+
+
+# exclude outliers
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + coord_cartesian(xlim=c(0, 3.5), ylim=c(0, 30)) + labs(title="The Relation between Observed Time and Stop Time", subtitle="(excluding outliers)", y="stop duration mins", x="observed duration mins")
+
+
 
 ```
 
@@ -199,18 +233,27 @@ for(i in seq_along(NYPD$SUSPECTED_CRIME_DESCRIPTION)){
 ggplot(NYPD, aes(CRIME_CATEGORIZATION)) + geom_bar(alpha=0.90, colour="red4", fill="red4",width=0.5) + labs(title= "Different Types of Crimes Suspected", y="count", x="types of crimes suspected")
 
 
-# And then we make 4 separate barplots for the 4 categories, showing the distribution of the specific  
+# And then we make 4 separate barplots -- 1 for each category, showing the distribution of the specific crime descriptions inside each category
+
+df_theft <- NYPD[NYPD$CRIME_CATEGORIZATION == "Theft",]
+ggplot(df_theft, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="red4", fill="red4",width=0.5) + labs(title= "Theft Suspected", y="count", x="types of theft suspected") + theme(axis.text.x=element_text(size=4.1))
+
+df_att_dam <- NYPD[NYPD$CRIME_CATEGORIZATION == "Attack and Damage",]
+ggplot(df_att_dam, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="red4", fill="red4",width=0.5) + labs(title= "Attack and Damage Suspected", y="count", x="types of attack and damage suspected") + theme(axis.text.x=element_text(size=4.5))
+
+df_proh_items <- NYPD[NYPD$CRIME_CATEGORIZATION == "Possession,Sale of Prohibited Items",]
+ggplot(df_proh_items, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="red4", fill="red4",width=0.5) + labs(title= "Possession,Sale of Prohibited Items Suspected", y="count", x="types of possesion,sale of prohibited items suspected") + theme(axis.text.x=element_text(size=3))
+
+df_others <- NYPD[NYPD$CRIME_CATEGORIZATION == "Others",]
+ggplot(df_others, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="red4", fill="red4",width=0.5) + labs(title= "Other Crimes Suspected", y="count", x="types of crimes")
+```
+
+```{r}
 
 ```
 
 ```{r}
-# FRISKED_FLAG into dataframe
-
-table(NYPD$FRISKED_FLAG)
-```
-
-```{r}
-# SEARCHED_FLAG into dataframe
+# FRISKED_FLAG and SEARCHED_FLAG into dataframe
 
 NYPD$FRISK_AND_SEARCH <- vector(mode='character', length(NYPD$FRISKED_FLAG))
 
@@ -229,6 +272,23 @@ for(i in seq_along(NYPD$FRISK_AND_SEARCH)){
 
 table(NYPD$FRISK_AND_SEARCH)
 ggplot(NYPD, aes(FRISK_AND_SEARCH)) + geom_bar(alpha=0.90, colour="mediumpurple3", fill="mediumpurple3",width=0.5) + labs(title= "The Number of Suspects Frisked or Searched", y="count", x="Frisked and Searched")
+
+
+
+# Observed time: only frisked VS only searched VS both VS none(excludes large numbers)
+ggplot(NYPD, aes(x = FRISK_AND_SEARCH, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35))
+
+# Observed time: only frisked VS only searched VS both VS none (excludes outliers)
+bound(NYPD$OBSERVED_DURATION_MINUTES)
+ggplot(NYPD, aes(x = FRISK_AND_SEARCH, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 3.5))
+
+
+# Stop time: only frisked VS only searched VS both VS none (excludes large numbers)
+ggplot(NYPD, aes(x = FRISK_AND_SEARCH, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 50))
+
+# Stop time: only frisked VS only searched VS both VS none (excludes outliers)
+bound(NYPD$STOP_DURATION_MINUTES)
+ggplot(NYPD, aes(x = FRISK_AND_SEARCH, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 30))
 
 
 ```
@@ -492,7 +552,7 @@ ggplot(NYPD, aes(SUSPECT_SEX)) + geom_bar(alpha=0.90, colour="salmon", fill="sal
 ```{r}
 # SUSPECT_RACE_DESCRIPTION
 class(NYPD$SUSPECT_RACE_DESCRIPTION)
-ggplot(NYPD, aes(SUSPECT_RACE_DESCRIPTION)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.5) + labs(title="", y="count", x="suspect race description") + theme(axis.text.x=element_text(size=4.1))
+ggplot(NYPD, aes(SUSPECT_RACE_DESCRIPTION)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.5) + labs(title="", y="count", x="suspect race description") + theme(axis.text.x=element_text(size=4.3))
 ```
 
 ```{r}
