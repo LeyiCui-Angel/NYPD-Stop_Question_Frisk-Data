@@ -357,6 +357,98 @@ b_a_s_acc <- 1709/(1709+4532)
 print(b_a_s_acc)
 zero_a_s_acc <- 13/(13+54)
 print(zero_a_s_acc)
+
+# need to remove some data?
+# scatter plot: suspect height with accuracy
+ggplot(data=NYPD) + geom_point(mapping = aes(x = SUSPECT_HEIGHT, y = SUSPECT_ARRESTED_FLAG))
+
+# scatter plot: suspect weight with accuracy
+ggplot(data=NYPD) + geom_point(mapping = aes(x = SUSPECT_WEIGHT, y = SUSPECT_ARRESTED_FLAG))
+
+# create dataframe on SUSPECT_BODY_BUILD_TYPE
+df_01_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "0",]
+df_HEA_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "HEA",]
+df_MED_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "MED",]
+df_THN_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "THN",]
+df_U_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "U",]
+df_XXX_suspect <- NYPD[NYPD$SUSPECT_BODY_BUILD_TYPE == "XXX",]
+head(df_01_suspect)
+head(df_HEA_suspect)
+head(df_MED_suspect)
+head(df_THN_suspect)
+head(df_U_suspect)
+head(df_XXX_suspect)
+# accuracy on SUSPECT_BODY_BUILD_TYPE
+df_01_suspect[df_01_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "01_suspect not arrested"
+df_01_suspect[df_01_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "01_suspect arrested"
+table(df_01_suspect$SUSPECT_ARRESTED_FLAG)
+df_HEA_suspect[df_HEA_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "hea_suspect not arrested"
+df_HEA_suspect[df_HEA_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "hea_suspect arrested"
+table(df_HEA_suspect$SUSPECT_ARRESTED_FLAG)
+df_MED_suspect[df_MED_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "med_suspect not arrested"
+df_MED_suspect[df_MED_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "med_suspect arrested"
+table(df_MED_suspect$SUSPECT_ARRESTED_FLAG)
+df_THN_suspect[df_THN_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "thn_suspect not arrested"
+df_THN_suspect[df_THN_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "thn_suspect arrested"
+table(df_THN_suspect$SUSPECT_ARRESTED_FLAG)
+df_U_suspect[df_U_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "u_suspect not arrested"
+df_U_suspect[df_U_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "u_suspect arrested"
+table(df_U_suspect$SUSPECT_ARRESTED_FLAG)
+df_XXX_suspect[df_XXX_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "xxx_suspect not arrested"
+df_XXX_suspect[df_XXX_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "xxx_suspect arrested"
+table(df_XXX_suspect$SUSPECT_ARRESTED_FLAG)
+
+zero1_a_s_acc <- 22/(22+126)
+print(zero1_a_s_acc)
+hea_a_s_acc <- 299/(299+757)
+print(hea_a_s_acc)
+med_a_s_acc <- 1098/(1098+3009)
+print(med_a_s_acc)
+thn_a_s_acc <- 1580/(1580+3738)
+print(thn_a_s_acc)
+u_a_s_acc <- 105/(105+226)
+print(u_a_s_acc)
+xxx_a_s_acc <- 11/(11+37)
+print(xxx_a_s_acc)
+
+# create dataframe on STOP_LOCATION_BORO_NAME
+df_BRONX_suspect <- NYPD[NYPD$STOP_LOCATION_BORO_NAME == "BRONX",]
+df_BROOKLYN_suspect <- NYPD[NYPD$STOP_LOCATION_BORO_NAME == "BROOKLYN",]
+df_MANHATTAN_suspect <- NYPD[NYPD$STOP_LOCATION_BORO_NAME == "MANHATTAN",]
+df_QUEENS_suspect <- NYPD[NYPD$STOP_LOCATION_BORO_NAME == "QUEENS",]
+df_SI_suspect <- NYPD[NYPD$STOP_LOCATION_BORO_NAME == "STATEN ISLAND",]
+head(df_BRONX_suspect)
+head(df_BROOKLYN_suspect)
+head(df_MANHATTAN_suspect)
+head(df_QUEENS_suspect)
+head(df_SI_suspect)
+# accuracy on STOP_LOCATION_BORO_NAME
+df_BRONX_suspect[df_BRONX_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "BRONX_suspect not arrested"
+df_BRONX_suspect[df_BRONX_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "BRONX_suspect arrested"
+table(df_BRONX_suspect$SUSPECT_ARRESTED_FLAG)
+df_BROOKLYN_suspect[df_BROOKLYN_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "BROOKLYN_suspect not arrested"
+df_BROOKLYN_suspect[df_BROOKLYN_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "BROOKLYN_suspect arrested"
+table(df_BROOKLYN_suspect$SUSPECT_ARRESTED_FLAG)
+df_MANHATTAN_suspect[df_MANHATTAN_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "MANHATTAN_suspect not arrested"
+df_MANHATTAN_suspect[df_MANHATTAN_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "MANHATTAN_suspect arrested"
+table(df_MANHATTAN_suspect$SUSPECT_ARRESTED_FLAG)
+df_QUEENS_suspect[df_QUEENS_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "QUEENS_suspect not arrested"
+df_QUEENS_suspect[df_QUEENS_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "QUEENS_suspect arrested"
+table(df_QUEENS_suspect$SUSPECT_ARRESTED_FLAG)
+df_SI_suspect[df_SI_suspect$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "SI_suspect not arrested"
+df_SI_suspect[df_SI_suspect$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "SI_suspect arrested"
+table(df_SI_suspect$SUSPECT_ARRESTED_FLAG)
+
+BRONX_a_s_acc <- 626/(626+1705)
+print(BRONX_a_s_acc)
+BROOKLYN_a_s_acc <- 912/(912+2720)
+print(BROOKLYN_a_s_acc)
+MANHATTAN_a_s_acc <- 901/(901+1956)
+print(MANHATTAN_a_s_acc)
+QUEENS_a_s_acc <- 554/(554+1294)
+print(QUEENS_a_s_acc)
+SI_a_s_acc <- 122/(122+218)
+print(SI_a_s_acc)
 ```
 
 ```{r}
