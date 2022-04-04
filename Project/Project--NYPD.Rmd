@@ -147,14 +147,41 @@ ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,50,by=1), 
 
 ```{r}
 # SUSPECTED_CRIME_DESCRIPTION
+
+table(NYPD$SUSPECTED_CRIME_DESCRIPTION)
+ggplot(NYPD, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="mediumpurple3", fill="mediumpurple3",width=0.5) + labs(title= "Suspected Types of Crimes", y="count", x="suspected crime description")
+
+
 ```
 
 ```{r}
 # FRISKED_FLAG into dataframe
+
+table(NYPD$FRISKED_FLAG)
 ```
 
 ```{r}
 # SEARCHED_FLAG into dataframe
+
+NYPD$FRISK_AND_SEARCH <- vector(mode='character', length(NYPD$FRISKED_FLAG))
+
+for(i in seq_along(NYPD$FRISK_AND_SEARCH)){
+  if(NYPD$FRISKED_FLAG[i] == "1" & NYPD$SEARCHED_FLAG[i] == "1"){
+    NYPD$FRISK_AND_SEARCH[i] <- "Frisked and Searched"
+    }else if (NYPD$FRISKED_FLAG[i] == "1" & NYPD$SEARCHED_FLAG[i] == "0") {
+      NYPD$FRISK_AND_SEARCH[i] <- "Only Frisked"
+      }else if (NYPD$FRISKED_FLAG[i] == "0" & NYPD$SEARCHED_FLAG[i] == "1") {
+        NYPD$FRISK_AND_SEARCH[i] <- "Only Searched"
+      }else{
+        NYPD$FRISK_AND_SEARCH[i] <- "Not Frisked Nor Searched"
+      }
+  
+}
+
+table(NYPD$FRISK_AND_SEARCH)
+ggplot(NYPD, aes(FRISK_AND_SEARCH)) + geom_bar(alpha=0.90, colour="mediumpurple3", fill="mediumpurple3",width=0.5) + labs(title= "The Number of Suspects Frisked or Searched", y="count", x="Frisked and Searched")
+
+
 ```
 
 ```{r}
