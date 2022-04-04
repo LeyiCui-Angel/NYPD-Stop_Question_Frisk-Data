@@ -33,19 +33,67 @@ ggplot(NYPD, aes(DAY2)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",wi
 
 # Function: rounding(inputNum, totalNum)
 rounding <- function(inputNum, totalNum) {
-   m <- totalNum/2
-   if(inputNum < m){
-     # round down
-   }
-   else{
-     #round up
-   }
+  if(is.na(inputNum)){return(FALSE)}else{
+    m <- totalNum/2
+    if(inputNum < m){
+      # round down
+      return(FALSE)
+    }else{
+      #round up
+      return(TRUE)
+    }
+  }
 }
 
 hour<-NYPD$Stop.Frisk.Time
+all_hour <- c()
 for(i in 1:length(hour)){
-  hourBefore <- substring(hour[i],4,5)
+  if(hour[i] == "#N/A" || is.na(hour[i]) || hour[i] == "" || hour[i] == FALSE){
+    hour[i] <- "NA"
+  }else{
+    temp <- c(strsplit(hour[i], ":"))
+    minBefore <- temp[[1]][[2]]
+    hourBefore <- temp[[1]][[1]]
+    if (rounding(strtoi(minBefore), 60)){
+      hourAfter <- as.character(strtoi(hourBefore)+1)
+      if (hourAfter == 24){
+        hourAfter <- "0"
+      }
+    }else{
+      hourAfter <- hourBefore
+    }
+    all_hour <- append(all_hour, hourAfter)
+  }
+  allH_df <- data.frame(all_hour)
 }
+reorder_hour <- c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","NA")
+allH_df$all_hour = factor(allH_df$all_hour,levels=reorder_hour)
+ggplot(allH_df, aes(all_hour)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="number of stops", x="hour")
+
+# Morning: from sunrise to 11:59 AM. Sunrise typically occurs around 6 AM.
+# Noon: at 12:00 PM.
+# Afternoon: from 12:01 PM to around 5:00 PM.
+# Evening: from 5:01 PM to 8 PM, or around sunset.
+# Early Night: from sunset 11:59 PM
+# Late Night: from 11:59 PM to sunrise around 5:59 AM.
+all_period <- c()
+for(i in 1:length(allH_df$all_hour)){
+  if (allH_df$all_hour[i] == "6" || allH_df$all_hour[i] == "7" || allH_df$all_hour[i] == "8" || allH_df$all_hour[i] == "9" || allH_df$all_hour[i] == "10" || allH_df$all_hour[i] == "11"){
+    all_period <- append(all_period, "Morning")
+  }else if(allH_df$all_hour[i] == "12"){
+    all_period <- append(all_period, "Noon")
+  }else if(allH_df$all_hour[i] == "13" || allH_df$all_hour[i] == "14" || allH_df$all_hour[i] == "15" || allH_df$all_hour[i] == "16"){
+    all_period <- append(all_period, "Afternoon")
+  }else if(allH_df$all_hour[i] == "17" || allH_df$all_hour[i] == "18" || allH_df$all_hour[i] == "19" || allH_df$all_hour[i] == "20" || allH_df$all_hour[i] == "21" || allH_df$all_hour[i] == "22" || allH_df$all_hour[i] == "23"){
+    all_period <- append(all_period, "Early Night")
+  }else{
+    all_period <- append(all_period, "Late Night")
+  }
+}
+allP_df <- data.frame(all_period)
+reorder_period <- c("Morning", "Noon", "Afternoon", "Early Night", "Late Night")
+allP_df$all_period = factor(allP_df$all_period,levels=reorder_period)
+ggplot(allP_df, aes(all_period)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="number of stops", x="time period")
 ```
 
 ```{r}
