@@ -234,6 +234,14 @@ male_a_acc <- 2639/(2639+6612)
 print(male_a_acc)
 female_a_acc <- 321/(321+904)
 print(female_a_acc)
+
+# scatter plot: observed time with accuracy
+ggplot(data=NYPD) + geom_point(mapping = aes(x = OBSERVED_DURATION_MINUTES, y = SUSPECT_ARRESTED_FLAG))
+# without outliers
+#ggplot(data=NYPD) + geom_point(mapping = aes(x = OBSERVED_DURATION_MINUTES, y = SUSPECT_ARRESTED_FLAG)) + coord_cartesian(xlim=c(0, 100))
+
+# scatter plot: stop time with accuracy
+ggplot(data=NYPD) + geom_point(mapping = aes(x = STOP_DURATION_MINUTES, y = SUSPECT_ARRESTED_FLAG))
 ```
 
 ```{r}
