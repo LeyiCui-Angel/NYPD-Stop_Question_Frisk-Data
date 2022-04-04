@@ -102,8 +102,27 @@ df_male_officer <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POM",]
 df_female_officer <- NYPD[NYPD$ISSUING_OFFICER_RANK == "POF",]
 head(df_male_officer)
 head(df_female_officer)
-nrow(df_male_officer)
-nrow(df_female_officer)
+
+# male vs female: number of officers
+male_female_num <- tibble(
+  type = c("male officer", "female officer"),
+  freq = c(nrow(df_male_officer), nrow(df_female_officer))
+)
+knitr::kable(male_female_num)
+
+p <- ggplot(data = male_female_num, mapping = aes(
+  x = type, y = freq ))
+p + geom_col() +
+  labs(x = "number of officers", 
+       y = "sex")
+
+p2 <- ggplot(data = male_female_num, mapping = aes(
+  x = 1, y = freq, fill = type ))
+p2 + geom_col() +
+  coord_polar(theta = "y") +
+  scale_x_discrete(name = NULL, breaks = NULL) +
+  scale_y_discrete(name = NULL, breaks = NULL) +
+  labs(fill = "Cut")
 ```
 
 ```{r}
@@ -167,10 +186,28 @@ ggplot(NYPD, aes(OFFICER_IN_UNIFORM_FLAG)) + geom_bar(alpha=0.90, colour="royalb
 ```
 
 ```{r}
-# SUSPECT_ARRESTED_FLAG 比对
+# SUSPECT_ARRESTED_FLAG 比对 overall
+NYPD[NYPD$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "suspect not arrested"
+NYPD[NYPD$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "suspect arrested"
+table(NYPD$SUSPECT_ARRESTED_FLAG)
+ggplot(NYPD, aes(SUSPECT_ARRESTED_FLAG)) + geom_bar(alpha=0.90, colour="royalblue1", fill="royalblue1",width=0.75) + labs(title="", y="number of stops", x="number os arrests")
+
+# accuracy of overall stops
+overall_a_acc <- 3115/11018
+print(overall_a_acc)
+
+# male officer's accuracy vs female officer's accuracy
+df_male_officer[df_male_officer$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "male_suspect not arrested"
+df_male_officer[df_male_officer$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "male_suspect arrested"
+table(df_male_officer$SUSPECT_ARRESTED_FLAG)
+df_female_officer[df_female_officer$SUSPECT_ARRESTED_FLAG==0,"SUSPECT_ARRESTED_FLAG"] <- "female_suspect not arrested"
+df_female_officer[df_female_officer$SUSPECT_ARRESTED_FLAG==1,"SUSPECT_ARRESTED_FLAG"] <- "female_suspect arrested"
+table(df_female_officer$SUSPECT_ARRESTED_FLAG)
+male_a_acc <- 2639/(2639+6612)
+print(male_a_acc)
+female_a_acc <- 321/(321+904)
+print(female_a_acc)
 ```
-
-
 
 ```{r}
 # function1: variable X VS observe duration minutes (boxplots && scatterpoots)
