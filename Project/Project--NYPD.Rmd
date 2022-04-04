@@ -111,16 +111,16 @@ nrow(df_female_officer)
 
 # function: exclude outliers from the dataframe (only for numeric values); need to input a numeric vector
 
-exclude_outliers <- function(x){
+  bound <- function(x){
   Q1 <- quantile(x, .25)
   Q3 <- quantile(x, .75)
   IQR <- Q3-Q1
-  outlier <- x<Q1-1.5*IQR | x>Q3+1.5*IQR
-  clean_x <- x[!outlier]
-  return(clean_x)
+  bound <- c(Q1-1.5*IQR, Q3+1.5*IQR)
+  return(bound)
 }
 ex_out <- exclude_outliers(NYPD$OBSERVED_DURATION_MINUTES)
 print(ex_out)
+
 ```
 
 ```{r}
@@ -131,7 +131,10 @@ ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(colour = "royalblue
 
 # Histogram --- excluded outliers
 table(NYPD$OBSERVED_DURATION_MINUTES)
-ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,35,by=1), colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (excluding outliers)", y="count", x="observed duration mins")
+ggplot(NYPD,aes(OBSERVED_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,3.5,by=1), colour = "royalblue1", fill = "royalblue1",alpha=0.8) + labs(title="Distribution of Suspects' Observed Duration Minutes (excluding outliers)", y="count", x="observed duration mins")
+
+bound(NYPD$OBSERVED_DURATION_MINUTES)
+
 
 
 ## Stop duration minutes.
@@ -147,10 +150,11 @@ ggplot(NYPD,aes(STOP_DURATION_MINUTES)) + geom_histogram(breaks=seq(0,50,by=1), 
 
 ```{r}
 # SUSPECTED_CRIME_DESCRIPTION
+unique(NYPD$SUSPECTED_CRIME_DESCRIPTION)
 
-table(NYPD$SUSPECTED_CRIME_DESCRIPTION)
-ggplot(NYPD, aes(SUSPECTED_CRIME_DESCRIPTION)) + geom_bar(alpha=0.90, colour="mediumpurple3", fill="mediumpurple3",width=0.5) + labs(title= "Suspected Types of Crimes", y="count", x="suspected crime description")
-
+# since there are too many types of crimes, we divide them into 4 main categories:
+# THEFT: "GRAND LARCENY AUTO", "BURGLARY", "CPSP(criminal possession of stolen property)", "GRAND LARCENY", "PETIT LARCENY", "ROBBERY", "THEFT OF SERVICES", "UNAUTHORIZED USE OF A VEHICLE";
+# ATTACK AND DAMAGE: "AUTO STRIPPIG", "ASSAULT", "CRIMINAL TRESPASS", "FORCIBLE TOUCHING", "MENACING", "MURDER", "RECKLESS ENDANGERMENT",
 
 ```
 
