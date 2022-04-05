@@ -8,9 +8,7 @@ output: html_document
 ```{r}
 # load the NYPD dataset and the packages that we will use
 NYPD <- read.csv("Data/2018_sqf_database-abbr.csv")
-install.packages("tidyverse")
-install.packages("dplyr")
-library(dplyr)
+
 library(tidyverse)
 library(ggplot2)
 library(magrittr)
