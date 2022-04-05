@@ -583,20 +583,19 @@ print(SI_a_s_acc)
 # function1: variable X VS observe duration minutes (box plots && scatterpLots)
 observe_time_relation <- function(m){
   if(class(m) == "character"){
-    ggplot(NYPD, aes(x = m, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35)) + labs( y="count", x=names(m))
+    ggplot(NYPD, aes(x = m, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35))
   }else{
-    ggplot(NYPD, aes(m, OBSERVED_DURATION_MINUTES)) + geom_point() + coord_cartesian(ylim=c(0, 35)) + labs( y="observed duration mins", x=names(m))
+    ggplot(NYPD, aes(m, OBSERVED_DURATION_MINUTES)) + geom_point() + coord_cartesian(ylim=c(0, 35)) 
   }
 }
-names(NYPD$SUSPECT_BODY_BUILD_TYPE)
 
 
 # function2: variable X VS stop duration minutes (box plots && scatterpLots)
 stop_time_relation <- function(n){
   if(class(n) == "character"){
-    ggplot(NYPD, aes(x = n, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 50)) + labs( y="count", x=n)
+    ggplot(NYPD, aes(x = n, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 50))
   }else{
-    ggplot(NYPD, aes(n, STOP_DURATION_MINUTES)) + geom_point() + coord_cartesian(ylim=c(0, 50)) + labs( y="observed duration mins", x=n)
+    ggplot(NYPD, aes(n, STOP_DURATION_MINUTES)) + geom_point() + coord_cartesian(ylim=c(0, 50)) 
   }
 }
 
@@ -610,80 +609,148 @@ observe_time_relation(NYPD$SUSPECT_SEX)
 
 # overall visualization
 class(NYPD$SUSPECT_REPORTED_AGE)
-ggplot(NYPD,aes(SUSPECT_REPORTED_AGE)) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect reported age")
+ggplot(NYPD,aes(SUSPECT_REPORTED_AGE)) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="Distribution of Suspect Reported Ages ", y="count", x="suspect reported age")
 
 # VS observed time
-observe_time_relation(NYPD$SUSPECT_REPORTED_AGE)
+observe_time_relation(NYPD$SUSPECT_REPORTED_AGE) + labs(title="Relation between Suspect Reported Ages and Observed Time ", y="observed duration mins", x="suspect reported ages")
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_REPORTED_AGE) + labs(title="Relation between Suspect Reported Ages and Stop Time ", y="stopped duration mins", x="suspect reported ages")
+
 
 ```
 
 ```{r}
-# SUSPECT_SEX
+##  SUSPECT SEX
+
+# overall visualization
 class(NYPD$SUSPECT_SEX)
-ggplot(NYPD, aes(SUSPECT_SEX)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="count", x="suspect sex")
+ggplot(NYPD, aes(SUSPECT_SEX)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="Distribution of Suspect Sex", y="count", x="suspect sex")
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_SEX) + labs(title="Observed Time for Different Suspect Sex", y="observed duration mins", x="suspect sex")
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_SEX) + labs(title="Stop Time for Different Suspect Sex", y="stopped duration mins", x="suspect sex")
+
+
 ```
 
 ```{r}
-# SUSPECT_RACE_DESCRIPTION
+## SUSPECT RACE DESCRIPTION
+
+# overall visualization
 class(NYPD$SUSPECT_RACE_DESCRIPTION)
-ggplot(NYPD, aes(SUSPECT_RACE_DESCRIPTION)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.5) + labs(title="", y="count", x="suspect race description") + theme(axis.text.x=element_text(size=4.3))
+ggplot(NYPD, aes(SUSPECT_RACE_DESCRIPTION)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.5) + labs(title="Distribution of Suspect Race Description", y="count", x="suspect race description") + theme(axis.text.x=element_text(size=4.3))
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_RACE_DESCRIPTION) + labs(title="Observed Time for Different Suspect Race Descriptions", y="observed duration mins", x="suspect race descriptions") +theme(axis.text.x=element_text(size=4.3))
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_RACE_DESCRIPTION) + labs(title="Stop Time for Different Suspect Race Descriptions", y="stopped duration mins", x="suspect race descriptions") +theme(axis.text.x=element_text(size=4.3))
 ```
 
 ```{r}
-# SUSPECT_HEIGHT 
-# we remove NAs here
-class(NYPD$SUSPECT_HEIGHT)
-max(NYPD$SUSPECT_HEIGHT,na.rm=TRUE)
+## SUSPECT HEIGHT 
+
+
+# overall visualization
 NYPD$SUSPECT_HEIGHT <- as.numeric(NYPD$SUSPECT_HEIGHT)
-ggplot(NYPD,aes(SUSPECT_HEIGHT),na.rm=TRUE) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect height")
+ggplot(NYPD,aes(SUSPECT_HEIGHT)) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="Distribution of Suspect Heights", y="count", x="suspect height")
 
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_HEIGHT) + labs(title="Relation between Suspect Height and Observed Time ", y="observed duration mins", x="suspect height")
 
-ggplot(NYPD, aes(SUSPECT_HEIGHT, OBSERVED_DURATION_MINUTES)) + geom_point(outlier.shape = NA) + coord_cartesian(ylim=c(0, 500))
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_HEIGHT) + labs(title="Relation between Suspect Height and Stop Time ", y="stopped duration mins", x="suspect height")
+
 ```
 
 ```{r}
-# SUSPECT_WEIGHT
-# we remove NAs here
-class(NYPD$SUSPECT_WEIGHT)
-max(NYPD$SUSPECT_WEIGHT,na.rm=TRUE)
+# SUSPECT WEIGHT
+
+
+# overall visualization
 NYPD$SUSPECT_WEIGHT <- as.numeric(NYPD$SUSPECT_WEIGHT)
-ggplot(NYPD,aes(SUSPECT_WEIGHT),na.rm=TRUE) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="", y="count", x="suspect weight")
+ggplot(NYPD,aes(SUSPECT_WEIGHT)) + geom_histogram(colour = "orange3", fill = "orange3",alpha=0.8) + labs(title="Distribution of Suspect Weights", y="count", x="suspect weight")
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_WEIGHT) + labs(title="Relation between Suspect Weight and Observed Time ", y="observed duration mins", x="suspect weight")
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_WEIGHT) + labs(title="Relation between Suspect Weight and Stop Time ", y="stopped duration mins", x="suspect weight")
+
 ```
 
 ```{r}
-# SUSPECT_BODY_BUILD_TYPE
+# SUSPECT BODY BUILD TYPE
+
+# overall visualization
 class(NYPD$SUSPECT_BODY_BUILD_TYPE)
-ggplot(NYPD, aes(SUSPECT_BODY_BUILD_TYPE)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect body build type")
+ggplot(NYPD, aes(SUSPECT_BODY_BUILD_TYPE)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="Distribution of Suspect Body Build Type", y="count", x="suspect body build type")
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_BODY_BUILD_TYPE) + labs(title="Observed Time for Different Suspect Body Build Types", y="observed duration mins", x="suspect body build type")
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_BODY_BUILD_TYPE) + labs(title="Stop Time for Different Suspect Body Build Types", y="stopped duration mins", x="suspect body build type") 
 ```
 
 ```{r}
-# SUSPECT_EYE_COLOR
+# SUSPECT EYE COLOR
+
+
+# overall visualization
 unique(NYPD$SUSPECT_EYE_COLOR)
-ggplot(NYPD, aes(SUSPECT_EYE_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect eye color")
+ggplot(NYPD, aes(SUSPECT_EYE_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="Distribution of Suspect Eye Colors", y="count", x="suspect eye color")
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_EYE_COLOR) + labs(title="Observed Time for Different Suspect Eye Colors", y="observed duration mins", x="suspect eye color") 
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_EYE_COLOR) + labs(title="Stop Time for Different Suspect Eye Colors", y="stopped duration mins", x="suspect eye color") 
 ```
 
 ```{r}
-# SUSPECT_HAIR_COLOR
+# SUSPECT HAIR COLOR
+
+
+# overall visualization
 unique(NYPD$SUSPECT_HAIR_COLOR)
-ggplot(NYPD, aes(SUSPECT_HAIR_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="", y="count", x="suspect hair color")
+ggplot(NYPD, aes(SUSPECT_HAIR_COLOR)) + geom_bar(alpha=0.90, colour="tomato", fill="tomato",width=0.5) + labs(title="Distribution of Suspect Hair Colors", y="count", x="suspect hair color")
+
+# VS observed time
+observe_time_relation(NYPD$SUSPECT_HAIR_COLOR) + labs(title="Observed Time for Different Suspect Hair Colors", y="observed duration mins", x="suspect hair color") 
+
+# VS stop time
+stop_time_relation(NYPD$SUSPECT_HAIR_COLOR) + labs(title="Stop Time for Different Suspect Hair Colors", y="stopped duration mins", x="suspect hair color") 
 ```
 
 ```{r}
-# STOP_LOCATION_BORO_NAME
+# STOP LOCATION BOROUGH NAME
+
+
+# overall visualization
 table(NYPD$STOP_LOCATION_BORO_NAME)
-ggplot(NYPD, aes(STOP_LOCATION_BORO_NAME)) + geom_bar(alpha=0.90, colour="orange3", fill="orange3",width=0.5) + labs(title="", y="count", x="stop borough")
+ggplot(NYPD, aes(STOP_LOCATION_BORO_NAME)) + geom_bar(alpha=0.90, colour="orange3", fill="orange3",width=0.5) + labs(title="Distribution of Suspect Location Boroughs", y="count", x="stop borough")
 
+# VS observed time
+observe_time_relation(NYPD$STOP_LOCATION_BORO_NAME) + labs(title="Observed Time for Different Suspect Location Boroughs", y="observed duration mins", x="suspect borough") 
 
-# To verify function1 and function2 //
+# VS stop time
+stop_time_relation(NYPD$STOP_LOCATION_BORO_NAME) + labs(title="Stop Time for Different Suspect Location Boroughs", y="stopped duration mins", x="suspect borough") 
+
+# //
+# To verify function1 and function2
 # Borough VS Stop Time
 mean(NYPD$STOP_DURATION_MINUTES)
 median(NYPD$STOP_DURATION_MINUTES)
-ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = STOP_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 20))
+ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = STOP_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 50))
 
 # Borough VS Observe Time
 mean(NYPD$OBSERVED_DURATION_MINUTES)
 median(NYPD$OBSERVED_DURATION_MINUTES)
-ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot(outlier.shape = NA) + coord_cartesian(ylim=c(0, 2.5))
+ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35))
 
 
 
