@@ -26,9 +26,9 @@ ggplot(NYPD, aes(MONTH2)) + geom_bar(alpha=0.90, colour="orange", fill="orange",
 ```
 
 ```{r}
-# The number of stops in each day during weeks
+# The number of stops on each day of the week
 
-#rearrange the days in order, from Monday to Sunday
+# rearrange the days in order, from Monday to Sunday
 reorder_day <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
 NYPD$DAY2 = factor(NYPD$DAY2,levels=reorder_day)
 ggplot(NYPD, aes(DAY2)) + geom_bar(alpha=0.90, colour="salmon", fill="salmon",width=0.75) + labs(title="", y="number of stops", x="day")
