@@ -14,6 +14,7 @@ NYPD <- read.csv("Data/2018_sqf_database-abbr.csv")
 library(tidyverse)
 library(ggplot2)
 library(magrittr)
+head(NYPD)
 ```
 
 ```{r}
@@ -799,7 +800,195 @@ print(uniform_arrested)
 
 #Create a bar graph of OFFICER_IN_UNIFORM_FLAG by SUSPECT_ARRESTED_FLAG
 ggplot(analysis_vars2, aes(OFFICER_IN_UNIFORM_FLAG)) + geom_bar(aes(fill = SUSPECT_ARRESTED_FLAG))
+```
 
+```{r}
+### Linear Regression 1: Observe Time VS. Stop Time
+
+
+## First roughly observe the linear relationship between Observe Mins and Stop Mins
+# scatter plot of observe time(x) vs. stop time(y), done above
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + labs(title="The Relation between Observed Time and Stop Time", subtitle="(with all data)", y="stop duration mins", x="observed duration mins")
+
+# calculate the correlation -- seems a moderate/weak positive correlation
+corr_observet_stopt <- cor(NYPD$OBSERVED_DURATION_MINUTES,NYPD$STOP_DURATION_MINUTES)
+print(paste("correlation between observe mins and stop mins is",corr_observet_stopt))
+
+# generate a line of best fit
+ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + geom_smooth(method="lm")
+
+
+
+## Build the linear regression model and check whether the residuals fit the assumptions
+observet_stopt_model <- lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = NYPD)
+print(observet_stopt_model)
+
+# generate histogram, normal probability plot of residuals and a residual plot -- the normal probability plot is not a diagonal approximately straight line, and the residuals are not very randomly scattered, so the linear regression model may not be appropriate in this case.
+residuals<-resid(observet_stopt_model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(observet_stopt_model), residuals)
+
+
+????
+## Exclude outliers whose standard residuals are greater than 2:
+standard_residuals <- rstandard(observet_stopt_model)
+plot(fitted(observet_stopt_model), standard_residuals)
+
+observet_stopt <- NYPD[c("OBSERVED_DURATION_MINUTES", "STOP_DURATION_MINUTES")]
+observet_stopt_stdres <- cbind(observet_stopt, standard_residuals)
+dim(observet_stopt_stdres)
+
+observet_stopt_analysis <- observet_stopt_stdres[observet_stopt_stdres$standard_residuals < 2,]
+
+
+#The lm() function only gives us the the intercept and slope coefficient for the regression line 
+#When we run the lm() function within the summary() function the results of the linear regression analysis will be produced.
+summary(lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = observet_stopt_analysis))
+????
+  
+aaa <- NYPD[NYPD$OBSERVED_DURATION_MINUTES<=35 && NYPD$STOP_DURATION_MINUTES <=50,]
+cor(aaa$OBSERVED_DURATION_MINUTES,aaa$STOP_DURATION_MINUTES)
+model <- lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = aaa)
+print(model)
+residuals<-resid(model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(model), residuals)
+```
+
+```{r}
+### Linear Regression 2: Observe Time VS. Suspect Height
+
+
+## First roughly observe the linear relationship between Observe Mins and Suspect Height
+
+# scatter plot of height(x) vs. observe time(y), done above
+ggplot(NYPD, aes(SUSPECT_HEIGHT, OBSERVED_DURATION_MINUTES)) + geom_point() + labs(title="Relation between Suspect Height and Observed Time ", y="observed duration mins", x="suspect height")
+
+# Here we use the same way as previously in part 1 to define and exclude outliers based on context; outliers: observed mins >35
+sample_h_observet <- NYPD[!is.na(NYPD$SUSPECT_HEIGHT) & NYPD$OBSERVED_DURATION_MINUTES<=35,]
+
+# calculate the correlation -- seems a very weak negative correlation
+corr_h_observet <- cor(sample_h_observet$SUSPECT_HEIGHT, sample_h_observet$OBSERVED_DURATION_MINUTES)
+print(paste("correlation between suspect height and observed mins is",corr_h_observet))
+
+# generate a line of best fit -- the line is approximately horizontal, meaning observed mins may not change a lot as height varies
+ggplot(sample_h_observet, aes(SUSPECT_HEIGHT, OBSERVED_DURATION_MINUTES)) + geom_point() + geom_smooth(method="lm")
+
+
+
+## Build the linear regression model and check whether the residuals fit the assumptions
+h_observet_model <- lm(OBSERVED_DURATION_MINUTES ~ SUSPECT_HEIGHT, data = sample_h_observet)
+print(h_observet_model)
+
+# generate histogram, normal probability plot of residuals and a residual plot -- the histogram is not normally distributed and the normal probability plot is not approximately a straight line, so the linear regression model may not be appropriate in this case.
+residuals<-resid(h_observet_model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(h_observet_model), residuals)
+
+# Calculate and plot the standard residuals
+standard_residuals <- rstandard(h_observet_model)
+plot(fitted(h_observet_model), standard_residuals)
+
+????
+## Exclude outliers whose standard residuals are greater than 2:
+
+observet_stopt <- NYPD[c("OBSERVED_DURATION_MINUTES", "STOP_DURATION_MINUTES")]
+observet_stopt_stdres <- cbind(observet_stopt, standard_residuals)
+dim(observet_stopt_stdres)
+
+observet_stopt_analysis <- observet_stopt_stdres[observet_stopt_stdres$standard_residuals < 2,]
+```
+
+```{r}
+### Comparison of Means T-test 1: mean observed duration time of 2 eye colors(a common eye color -- Black and an uncommon eye color -- Blue)
+
+## how we define common and uncommon: 1025 observations of "black eye", 157 observations of "blue eye"
+unique(NYPD$SUSPECT_EYE_COLOR)
+table(NYPD$SUSPECT_EYE_COLOR)
+
+
+## subset the vectors that we are going to do the t-test
+# We use the same method as previously in part 1 to exclude outliers in observed time(>35). We have to exclude that before the test, otherwise the mean would be severely raised by the outliers
+sample_eye_observet <- NYPD %>%
+       select(OBSERVED_DURATION_MINUTES, SUSPECT_EYE_COLOR) %>%
+       filter(SUSPECT_EYE_COLOR %in% c("BRO", "BLU"), OBSERVED_DURATION_MINUTES<=35)
+
+
+## Calculate the mean observed time by eye color
+mean_observet_by_eyecolor <- sample_eye_observet %>%
+       group_by(SUSPECT_EYE_COLOR) %>%
+       summarize(mean_observet = mean(OBSERVED_DURATION_MINUTES, na.rm=TRUE))
+print(mean_observet_by_eyecolor)
+
+
+## Create a comparative box plot of Observed Duration Minutes by Eye Color
+ggplot(sample_eye_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_EYE_COLOR)) + geom_boxplot(colour = "blue", fill="grey") + ggtitle("Observed Time by Eye Color")
+
+
+## Conduct a comparison of means t-test:
+t.test(OBSERVED_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_observet, equal.var=FALSE)
+
+# from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
+```
+
+```{r}
+### Comparison of Means T-test 2: mean observed duration time of thin suspects and heavy suspects (body build type)
+
+unique(NYPD$SUSPECT_BODY_BUILD_TYPE)
+table(NYPD$SUSPECT_BODY_BUILD_TYPE) # Thin suspects are far more than heavy suspects.
+
+# We will use all the data to conduct the test first, and then we do again without outliers(observed mins >35)
+
+## subset the vectors that we are going to do the t-test
+all_sample_body_observet <- NYPD %>%
+       select(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE) %>%
+       filter(SUSPECT_BODY_BUILD_TYPE %in% c("HEA", "THN"))
+
+
+## Calculate the mean observed time by body build type
+all_mean_observet_by_body <- sample_body_observet %>%
+       group_by(SUSPECT_BODY_BUILD_TYPE) %>%
+       summarize(all_mean_observet = mean(OBSERVED_DURATION_MINUTES, na.rm=TRUE))
+print(all_mean_observet_by_body)
+
+
+## Create a comparative box plot of Observed Duration Minutes by Body Build Type
+ggplot(all_sample_body_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Observed Time by Body Build Type")
+
+
+## Conduct a comparison of means t-test:
+t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=all_sample_body_observet, equal.var=FALSE)
+
+# from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of thin suspects and heavy suspects(with all data including outliers). Even though we could see obvious difference in the computed means(Thin 33.04 mins, Heavy 10.99 mins), we cannot conclude the mean observed time is different in these 2 groups.
+
+
+
+
+
+# Then do it again excluding outliers: we use the same method as previously in part 1 to exclude outliers in observed time(>35), which is defined according to context. 
+sample_body_observet <- NYPD %>%
+       select(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE) %>%
+       filter(SUSPECT_BODY_BUILD_TYPE %in% c("HEA", "THN"), OBSERVED_DURATION_MINUTES<=35)
+
+
+mean_observet_by_body <- sample_body_observet %>%
+       group_by(SUSPECT_BODY_BUILD_TYPE) %>%
+       summarize(mean_observet = mean(OBSERVED_DURATION_MINUTES, na.rm=TRUE))
+print(mean_observet_by_body)
+
+
+
+ggplot(sample_body_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Observed Time by Body Build Type")
+
+
+t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_observet, equal.var=FALSE)
+
+# The p-value is much higher this time(0.98 >>> 0.05), we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
+```
+```{r}
 #Conduct a Chi-Squared Test of Independence
 chisq.test(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARRESTED_FLAG)
 ```
