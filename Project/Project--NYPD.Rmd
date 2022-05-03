@@ -5,6 +5,8 @@ date: "3/29/2022"
 output: html_document
 ---
 
+Part I
+
 ```{r}
 # load the NYPD dataset and the packages that we will use
 NYPD <- read.csv("Data/2018_sqf_database-abbr.csv")
@@ -739,7 +741,6 @@ observe_time_relation(NYPD$STOP_LOCATION_BORO_NAME) + labs(title="Observed Time 
 # VS stop time
 stop_time_relation(NYPD$STOP_LOCATION_BORO_NAME) + labs(title="Stop Time for Different Suspect Location Boroughs", y="stopped duration mins", x="suspect borough") 
 
-# //
 # To verify function1 and function2
 # Borough VS Stop Time
 mean(NYPD$STOP_DURATION_MINUTES)
@@ -750,11 +751,56 @@ ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = STOP_DURATION_MINUTES)) + geom
 mean(NYPD$OBSERVED_DURATION_MINUTES)
 median(NYPD$OBSERVED_DURATION_MINUTES)
 ggplot(NYPD, aes(x = STOP_LOCATION_BORO_NAME, y = OBSERVED_DURATION_MINUTES)) + geom_boxplot() + coord_cartesian(ylim=c(0, 35))
-
-
-
 ```
 
+Part II
+
+```{r}
+# We use chi-squared test of independence to compare the proportion. Here, we have:
+# Null hypothesis: There is no association between category A and category B
+# Alternative hypothesis: There is an association between category A and category B
+
+install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+
+#head(NYPD)
+
+#Select the variables we want to analyze: FRISKED_FLAG, SEARCHED_FLAG
+analysis_vars <- NYPD %>%
+       select(FRISKED_FLAG, SEARCHED_FLAG) %>%
+       filter(FRISKED_FLAG %in% c("0", "1"), SEARCHED_FLAG %in% c("0", "1"))
+
+head(analysis_vars)
+
+#Let's investigate to see if there is an association between FRISKED_FLAG and SEARCHED_FLAG
+frisked_searched <- table(analysis_vars$FRISKED_FLAG, analysis_vars$SEARCHED_FLAG)
+print(frisked_searched)
+
+#Create a bar graph of FRISKED_FLAG by SEARCHED_FLAG
+ggplot(analysis_vars, aes(FRISKED_FLAG)) + geom_bar(aes(fill = SEARCHED_FLAG))
+
+#Conduct a Chi-Squared Test of Independence
+chisq.test(analysis_vars$FRISKED_FLAG, analysis_vars$SEARCHED_FLAG)
+```
+
+```{r}
+# Chi-square Test
+
+#Select the variables we want to analyze: OFFICER_IN_UNIFORM_FLAG, SUSPECT_ARRESTED_FLAG
+analysis_vars2 <- NYPD %>%
+       select(OFFICER_IN_UNIFORM_FLAG, SUSPECT_ARRESTED_FLAG) %>%
+       filter(OFFICER_IN_UNIFORM_FLAG %in% c("0", "1"), SUSPECT_ARRESTED_FLAG %in% c("0", "1"))
+
+head(analysis_vars2)
+
+#Let's investigate to see if there is an association between OFFICER_IN_UNIFORM_FLAG and SUSPECT_ARRESTED_FLAG
+uniform_arrested <- table(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARRESTED_FLAG)
+print(uniform_arrested)
+
+#Create a bar graph of OFFICER_IN_UNIFORM_FLAG by SUSPECT_ARRESTED_FLAG
+ggplot(analysis_vars2, aes(OFFICER_IN_UNIFORM_FLAG)) + geom_bar(aes(fill = SUSPECT_ARRESTED_FLAG))
+```
 
 ```{r}
 ### Linear Regression 1: Observe Time VS. Stop Time
@@ -809,9 +855,7 @@ residuals<-resid(model)
 hist(residuals)
 qqnorm(residuals)
 plot(fitted(model), residuals)
-  
 ```
-
 
 ```{r}
 ### Linear Regression 2: Observe Time VS. Suspect Height
@@ -856,10 +900,7 @@ observet_stopt_stdres <- cbind(observet_stopt, standard_residuals)
 dim(observet_stopt_stdres)
 
 observet_stopt_analysis <- observet_stopt_stdres[observet_stopt_stdres$standard_residuals < 2,]
-
-
 ```
-
 
 ```{r}
 ### Comparison of Means T-test 1: mean observed duration time of 2 eye colors(a common eye color -- Black and an uncommon eye color -- Blue)
@@ -892,7 +933,6 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_observet, eq
 
 # from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
 ```
-
 
 ```{r}
 ### Comparison of Means T-test 2: mean observed duration time of thin suspects and heavy suspects (body build type)
@@ -948,5 +988,7 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_obser
 
 # The p-value is much higher this time(0.98 >>> 0.05), we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
 ```
-
-
+```{r}
+#Conduct a Chi-Squared Test of Independence
+chisq.test(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARRESTED_FLAG)
+```
