@@ -73,7 +73,7 @@ chisq.test(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARREST
 
 
 ## First roughly observe the linear relationship between Observe Mins and Stop Mins
-# scatter plot of observe time(x) vs. stop time(y), done above
+# scatter plot of observe time(x) vs. stop time(y), done above -- seems not very linear
 ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + labs(title="The Relation between Observed Time and Stop Time", subtitle="(with all data)", y="stop duration mins", x="observed duration mins")
 
 # calculate the correlation -- seems a moderate/weak positive correlation
@@ -84,38 +84,135 @@ print(paste("correlation between observe mins and stop mins is",corr_observet_st
 ggplot(NYPD, aes(OBSERVED_DURATION_MINUTES, STOP_DURATION_MINUTES)) + geom_point() + geom_smooth(method="lm")
 
 
-
 ## Build the linear regression model and check whether the residuals fit the assumptions
 observet_stopt_model <- lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = NYPD)
 print(observet_stopt_model)
 
-# generate histogram, normal probability plot of residuals and a residual plot -- the normal probability plot is not a diagonal approximately straight line, and the residuals are not very randomly scattered, so the linear regression model may not be appropriate in this case.
+# generate histogram, normal probability plot of residuals and a residual plot -- the normal probability plot is not straight at the right end, and the residuals are not very randomly scattered, so the linear regression model may not be appropriate in this case. Or it could be mainly due to extremely large outliers.
 residuals<-resid(observet_stopt_model)
 hist(residuals)
 qqnorm(residuals)
 plot(fitted(observet_stopt_model), residuals)
 
-
-## Exclude outliers whose standard residuals are greater than 2:
+# calculate and plot the standard residuals:
 standard_residuals <- rstandard(observet_stopt_model)
 plot(fitted(observet_stopt_model), standard_residuals)
 
+
+## Data Extraction: exclude outliers whose standard residuals are greater than 2:
 observet_stopt <- NYPD[c("OBSERVED_DURATION_MINUTES", "STOP_DURATION_MINUTES")]
 observet_stopt_stdres <- cbind(observet_stopt, standard_residuals)
 dim(observet_stopt_stdres)
 
 observet_stopt_analysis <- observet_stopt_stdres[observet_stopt_stdres$standard_residuals < 2,]
+dim(observet_stopt_analysis)
+
+
+## Summary of Linear Regression Analysis: the p-value for the slope coefficient is much higher than 0.05, so there is no statistical evidence that there is a linear relationship between observed time and stop time
+summary(lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = observet_stopt_analysis))
+
+
+
+
+
+
+### We would do the linear regression analysis again by excluding the outliers in Observe Time and Stop Time based on the methods we defined previously
+### Outliers: Observe mins >35, Stop mins >50
+
+exclude_observet_stopt <- NYPD[NYPD$OBSERVED_DURATION_MINUTES <=35 & NYPD$STOP_DURATION_MINUTES <=50,]
+dim(exclude_observet_stopt)
+dim(NYPD)
+
+# Build the linear regression model and check whether the residuals fit the assumptions
+exclude_observet_stopt_model <- lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = exclude_observet_stopt)
+print(exclude_observet_stopt_model)
+
+# generate histogram, normal probability plot of residuals and a residual plot 
+residuals<-resid(exclude_observet_stopt_model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(exclude_observet_stopt_model), residuals)
+
+# calculate and plot the standard residuals:
+standard_residuals <- rstandard(exclude_observet_stopt_model)
+plot(fitted(exclude_observet_stopt_model), standard_residuals)
+
+## Data Extraction: exclude outliers whose standard residuals are greater than 2:
+exclude_observet_stopt <- exclude_observet_stopt[c("OBSERVED_DURATION_MINUTES", "STOP_DURATION_MINUTES")]
+exclude_observet_stopt_stdres <- cbind(exclude_observet_stopt, standard_residuals)
+dim(exclude_observet_stopt_stdres)
+
+exclude_observet_stopt_analysis <- exclude_observet_stopt_stdres[exclude_observet_stopt_stdres$standard_residuals < 2,]
+dim(exclude_observet_stopt_analysis)
+
+## Summary of Linear Regression Analysis: the p-value for the slope coefficient is very small(much smaller than 0.05), so there is statistical evidence that stop mins is positively linear ro observed mins, after we excluding the outliers. The slope coefficient is about 0.25.
+summary(lm(STOP_DURATION_MINUTES ~ OBSERVED_DURATION_MINUTES, data = exclude_observet_stopt_analysis))
+
+cor(exclude_observet_stopt_analysis$OBSERVED_DURATION_MINUTES,exclude_observet_stopt_analysis$STOP_DURATION_MINUTES)
 
 ```
 
 
 ```{r}
-### Linear Regression 2: Observe Time VS. Suspect Height
+### Linear Regression 2: Stop Time VS. Suspect Reported Age
+
+
+## First roughly observe the linear relationship between Stop Mins and Suspect Reported Age
+# scatter plot of suspect reported age(x) vs. stop time(y), done above -- it is not linear by observation
+ggplot(NYPD, aes(SUSPECT_REPORTED_AGE, STOP_DURATION_MINUTES)) + geom_point() + labs(title="Relation between Suspect Reported Age and Stop Time ", y="stop duration mins", x="suspect reported age")
+
+# Here we use the same way as previously in part 1 to define and exclude outliers based on context; outliers: stop mins >50
+sample_age_stopt <- NYPD[!NYPD$SUSPECT_REPORTED_AGE==0 & NYPD$STOP_DURATION_MINUTES<=50,]
+
+# calculate the correlation -- seems a very weak positive correlation
+corr_age_stopt <- cor(sample_age_stopt$SUSPECT_REPORTED_AGE, sample_age_stopt$STOP_DURATION_MINUTES)
+print(paste("correlation between suspect reported age and stop mins is",corr_age_stopt))
+
+# generate a line of best fit -- the line is approximately horizontal, meaning stop mins may not change a lot as age varies
+ggplot(sample_age_stopt, aes(SUSPECT_REPORTED_AGE, STOP_DURATION_MINUTES)) + geom_point() + geom_smooth(method="lm")
+
+
+
+## Build the linear regression model and check whether the residuals fit the assumptions
+age_stopt_model <- lm(STOP_DURATION_MINUTES ~ SUSPECT_REPORTED_AGE, data = sample_age_stopt)
+print(age_stopt_model)
+
+# generate histogram, normal probability plot of residuals and a residual plot -- the histogram is not normally distributed and the normal probability plot is not approximately a straight line, so the linear regression model may not be appropriate in this case.
+residuals<-resid(age_stopt_model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(age_stopt_model), residuals)
+
+# Calculate and plot the standard residuals
+standard_residuals <- rstandard(age_stopt_model)
+plot(fitted(age_stopt_model), standard_residuals)
+length(standard_residuals)
+length(sample_age_stopt$STOP_DURATION_MINUTES)
+
+
+
+## Data Extraction: exclude outliers whose standard residuals are greater than 2:
+age_stopt <- sample_age_stopt[c("SUSPECT_REPORTED_AGE", "STOP_DURATION_MINUTES")]
+age_stopt_stdres <- cbind(age_stopt, standard_residuals)
+dim(age_stopt_stdres)
+
+age_stopt_analysis <- age_stopt_stdres[age_stopt_stdres$standard_residuals < 2,]
+dim(age_stopt_analysis)
+
+
+## Summary of Linear Regression Analysis: the p-value for the slope coefficient is 0.03, which is less than 0.05, so we could reject the null hypothesis here in favor of alternative hypothesis. That is, there is statistical significance that suspect reported age is negatively linear to stop time.
+summary(lm(STOP_DURATION_MINUTES ~ SUSPECT_REPORTED_AGE, data = age_stopt_analysis))
+
+
+
+```
+
+```{r}
+### Linear Regression 3: Observe Time VS. Suspect Height
 
 
 ## First roughly observe the linear relationship between Observe Mins and Suspect Height
-
-# scatter plot of height(x) vs. observe time(y), done above
+# scatter plot of height(x) vs. observe time(y), done above -- it is not linear by observation
 ggplot(NYPD, aes(SUSPECT_HEIGHT, OBSERVED_DURATION_MINUTES)) + geom_point() + labs(title="Relation between Suspect Height and Observed Time ", y="observed duration mins", x="suspect height")
 
 # Here we use the same way as previously in part 1 to define and exclude outliers based on context; outliers: observed mins >35
@@ -145,7 +242,75 @@ plot(fitted(h_observet_model), residuals)
 standard_residuals <- rstandard(h_observet_model)
 plot(fitted(h_observet_model), standard_residuals)
 
+
+## Data Extraction: exclude outliers whose standard residuals are greater than 2:
+h_observet <- sample_h_observet[c("SUSPECT_HEIGHT", "OBSERVED_DURATION_MINUTES")]
+h_observet_stdres <- cbind(h_observet, standard_residuals)
+dim(h_observet_stdres)
+
+h_observet_analysis <- h_observet_stdres[h_observet_stdres$standard_residuals < 2,]
+dim(h_observet_analysis)
+
+
+## Summary of Linear Regression Analysis: the p-value for the slope coefficient is much higher than 0.05, so there is no statistical evidence that there is a linear relationship between suspect heights and observed time
+summary(lm(OBSERVED_DURATION_MINUTES ~ SUSPECT_HEIGHT, data = h_observet_analysis))
+
+
+
 ```
+```{r}
+### Linear Regression 4: Stop Time VS. Suspect Weight
+
+
+## First roughly observe the linear relationship between Stop Mins and Suspect Weight
+# scatter plot of suspect weight(x) vs. stop time(y), done above -- it is not linear by observation
+ggplot(NYPD, aes(SUSPECT_WEIGHT, STOP_DURATION_MINUTES)) + geom_point() + labs(title="Relation between Suspect Weight and Stop Time ", y="stop duration mins", x="suspect weight")
+
+
+# Here we use the same way as previously in part 1 to define and exclude outliers based on context; outliers: stop mins >50
+sample_w_stopt <- NYPD[!is.na(NYPD$SUSPECT_WEIGHT) & NYPD$STOP_DURATION_MINUTES<=50,]
+
+# calculate the correlation -- seems a very weak negative correlation
+corr_w_stopt <- cor(sample_w_stopt$SUSPECT_WEIGHT, sample_w_stopt$STOP_DURATION_MINUTES)
+print(paste("correlation between suspect weight and stop mins is",corr_w_stopt))
+
+# generate a line of best fit -- the line is downward light sloping
+ggplot(sample_w_stopt, aes(SUSPECT_WEIGHT, STOP_DURATION_MINUTES)) + geom_point() + geom_smooth(method="lm")
+
+
+
+## Build the linear regression model and check whether the residuals fit the assumptions
+w_stopt_model <- lm(STOP_DURATION_MINUTES ~ SUSPECT_WEIGHT, data = sample_w_stopt)
+print(w_stopt_model)
+
+# generate histogram, normal probability plot of residuals and a residual plot -- the histogram is not normally distributed, the residuals are not very randomly scattered, and the normal probability plot is not approximately a straight line, so the linear regression model may not be appropriate in this case.
+residuals<-resid(w_stopt_model)
+hist(residuals)
+qqnorm(residuals)
+plot(fitted(w_stopt_model), residuals)
+
+# Calculate and plot the standard residuals
+standard_residuals <- rstandard(w_stopt_model)
+plot(fitted(w_stopt_model), standard_residuals)
+
+
+
+## Data Extraction: exclude outliers whose standard residuals are greater than 2:
+w_stopt <- sample_w_stopt[c("SUSPECT_WEIGHT", "STOP_DURATION_MINUTES")]
+w_stopt_stdres <- cbind(w_stopt, standard_residuals)
+dim(w_stopt_stdres)
+
+w_stopt_analysis <- w_stopt_stdres[w_stopt_stdres$standard_residuals < 2,]
+dim(w_stopt_analysis)
+
+
+## Summary of Linear Regression Analysis: the p-value for the slope coefficient is 0.04, which is less than 0.05, so we could reject the null hypothesis here in favor of alternative hypothesis. That is, there is statistical significance that suspect weight is negatively linear to stop time.
+summary(lm(STOP_DURATION_MINUTES ~ SUSPECT_WEIGHT, data = w_stopt_analysis))
+
+
+```
+
+
 
 
 ```{r}
