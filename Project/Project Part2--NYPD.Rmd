@@ -5,7 +5,16 @@ date: "05/04/2022"
 output: html_document
 ---
 
+
 ```{r}
+
+### In part 2, we will continue analyzing the potential relationships between variables that we have interest in. We will conduct 12 statistical analyses in total:
+# 2 Chi-square tests to explore association between two categorical variables(Frisk VS Search, Officer in uniform VS Suspect arrested);
+# 4 linear regressions to find out whether linear relation exists in two numeric variables(Observe time VS Stop time, Stop time VS Suspect reported age, Observe time VS Suspect height, Stop time VS Suspect weight);
+# 6 Comparisons of Means T-test to see whether there is statistical difference between two specific groups in means of the variable studied(means of observe mins/stop mins of 2 different eye colors, means of observe mins/stop mins of thin suspects and heavy suspects, means of observe mins/stop mins of female suspects and male suspects).
+
+### We also develop our own methods to define and exclude outliers(since there are extreme large values in our studied variables), and use that to conduct the analysis again after using complete data to do first. Sometimes there is no statistical result found in the complete data, but we got some interesting results after excluding the extreme outliers.
+
 # load the NYPD dataset and the packages that we will use
 NYPD <- read.csv("Data/2018_sqf_database-abbr.csv")
 
@@ -17,7 +26,9 @@ head(NYPD)
 
 
 ```{r}
-# We use chi-squared test of independence to compare the proportion. Here, we have:
+## Chi-square Test 1: Frisk Flag VS. Search Flag
+
+
 # Null hypothesis: There is no association between category A and category B
 # Alternative hypothesis: There is an association between category A and category B
 
@@ -47,7 +58,7 @@ chisq.test(analysis_vars$FRISKED_FLAG, analysis_vars$SEARCHED_FLAG)
 
 
 ```{r}
-# Chi-square Test
+## Chi-square Test 2: Officer in Uniform Flag VS. Suspect Arrested Flag
 
 #Select the variables we want to analyze: OFFICER_IN_UNIFORM_FLAG, SUSPECT_ARRESTED_FLAG
 analysis_vars2 <- NYPD %>%
@@ -207,6 +218,7 @@ summary(lm(STOP_DURATION_MINUTES ~ SUSPECT_REPORTED_AGE, data = age_stopt_analys
 
 ```
 
+
 ```{r}
 ### Linear Regression 3: Observe Time VS. Suspect Height
 
@@ -258,6 +270,9 @@ summary(lm(OBSERVED_DURATION_MINUTES ~ SUSPECT_HEIGHT, data = h_observet_analysi
 
 
 ```
+
+
+
 ```{r}
 ### Linear Regression 4: Stop Time VS. Suspect Weight
 
@@ -345,6 +360,8 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_observet, eq
 # From the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
 ```
 
+
+
 ```{r}
 ### Comparison of Means T-test 2: mean stop duration time of 2 eye colors(a common eye color -- Black and an uncommon eye color -- Blue)
 
@@ -376,6 +393,8 @@ t.test(STOP_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_stopt, equal.var
 
 # From the t-test result we see, p-value is higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
 ```
+
+
 
 ```{r}
 ### Comparison of Means T-test 3: mean observed duration time of thin suspects and heavy suspects (body build type)
@@ -432,6 +451,8 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_obser
 # The p-value is much higher this time(0.98 >>> 0.05), we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
 ```
 
+
+
 ```{r}
 ### Comparison of Means T-test 4: mean stop duration time of thin suspects and heavy suspects (body build type)
 
@@ -487,6 +508,8 @@ t.test(STOP_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_stopt, eq
 # The p-value is much higher this time. Thus, we are rejecting the null hypothesis.
 ```
 
+
+
 ```{r}
 ### Comparison of Means T-test 5: mean observed duration time of male suspects and female suspects (sex)
 
@@ -541,6 +564,10 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_SEX, data=sample_sex_observet, equal.va
 
 # The p-value is much higher this time, we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
 ```
+
+
+
+
 
 ```{r}
 ### Comparison of Means T-test 6: mean stop duration time of male suspects and female suspects (sex)
