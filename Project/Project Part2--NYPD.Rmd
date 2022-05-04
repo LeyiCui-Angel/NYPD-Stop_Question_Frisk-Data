@@ -342,12 +342,43 @@ ggplot(sample_eye_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_EYE_COLOR)) +
 ## Conduct a comparison of means t-test:
 t.test(OBSERVED_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_observet, equal.var=FALSE)
 
-# from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
+# From the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
 ```
 
+```{r}
+### Comparison of Means T-test 2: mean stop duration time of 2 eye colors(a common eye color -- Black and an uncommon eye color -- Blue)
+
+## how we define common and uncommon: 1025 observations of "black eye", 157 observations of "blue eye"
+unique(NYPD$SUSPECT_EYE_COLOR)
+table(NYPD$SUSPECT_EYE_COLOR)
+
+
+## subset the vectors that we are going to do the t-test
+# We use the same method as previously in part 1 to exclude outliers in stop time(>50). We have to exclude that before the test, otherwise the mean would be severely raised by the outliers
+sample_eye_stopt <- NYPD %>%
+       select(STOP_DURATION_MINUTES, SUSPECT_EYE_COLOR) %>%
+       filter(SUSPECT_EYE_COLOR %in% c("BRO", "BLU"), STOP_DURATION_MINUTES<=50)
+
+
+## Calculate the mean stop time by eye color
+mean_stopt_by_eyecolor <- sample_eye_stopt %>%
+       group_by(SUSPECT_EYE_COLOR) %>%
+       summarize(mean_stopt = mean(STOP_DURATION_MINUTES, na.rm=TRUE))
+print(mean_stopt_by_eyecolor)
+
+
+## Create a comparative box plot of Stop Duration Minutes by Eye Color
+ggplot(sample_eye_stopt, aes(STOP_DURATION_MINUTES, SUSPECT_EYE_COLOR)) + geom_boxplot(colour = "blue", fill="grey") + ggtitle("Stop Time by Eye Color")
+
+
+## Conduct a comparison of means t-test:
+t.test(STOP_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_stopt, equal.var=FALSE)
+
+# From the t-test result we see, p-value is higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
+```
 
 ```{r}
-### Comparison of Means T-test 2: mean observed duration time of thin suspects and heavy suspects (body build type)
+### Comparison of Means T-test 3: mean observed duration time of thin suspects and heavy suspects (body build type)
 
 unique(NYPD$SUSPECT_BODY_BUILD_TYPE)
 table(NYPD$SUSPECT_BODY_BUILD_TYPE) # Thin suspects are far more than heavy suspects.
@@ -374,7 +405,7 @@ ggplot(all_sample_body_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUI
 ## Conduct a comparison of means t-test:
 t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=all_sample_body_observet, equal.var=FALSE)
 
-# from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of thin suspects and heavy suspects(with all data including outliers). Even though we could see obvious difference in the computed means(Thin 33.04 mins, Heavy 10.99 mins), we cannot conclude the mean observed time is different in these 2 groups.
+# From the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of thin suspects and heavy suspects(with all data including outliers). Even though we could see obvious difference in the computed means(Thin 33.04 mins, Heavy 10.99 mins), we cannot conclude the mean observed time is different in these 2 groups.
 
 
 
@@ -399,4 +430,169 @@ ggplot(sample_body_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_T
 t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_observet, equal.var=FALSE)
 
 # The p-value is much higher this time(0.98 >>> 0.05), we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
+```
+
+```{r}
+### Comparison of Means T-test 4: mean stop duration time of thin suspects and heavy suspects (body build type)
+
+unique(NYPD$SUSPECT_BODY_BUILD_TYPE)
+table(NYPD$SUSPECT_BODY_BUILD_TYPE) # Thin suspects are far more than heavy suspects.
+
+# We will use all the data to conduct the test first, and then we do again without outliers(stop mins >50)
+
+## subset the vectors that we are going to do the t-test
+all_sample_body_stopt <- NYPD %>%
+       select(STOP_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE) %>%
+       filter(SUSPECT_BODY_BUILD_TYPE %in% c("HEA", "THN"))
+
+
+## Calculate the mean stop time by body build type
+all_mean_stopt_by_body <- all_sample_body_stopt %>%
+       group_by(SUSPECT_BODY_BUILD_TYPE) %>%
+       summarize(all_mean_stopt = mean(STOP_DURATION_MINUTES, na.rm=TRUE))
+print(all_mean_stopt_by_body)
+
+
+## Create a comparative box plot of Stop Duration Minutes by Body Build Type
+ggplot(all_sample_body_stopt, aes(STOP_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Stop Time by Body Build Type")
+
+
+## Conduct a comparison of means t-test:
+t.test(STOP_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=all_sample_body_stopt, equal.var=FALSE)
+
+# From the t-test result we see, p-value is smaller than 0.05 which implies there is statistical significant difference in stop time means of thin suspects and heavy suspects(with all data including outliers).
+
+
+
+
+
+# Then do it again excluding outliers: we use the same method as previously in part 1 to exclude outliers in stop time(>50), which is defined according to context. 
+sample_body_stopt <- NYPD %>%
+       select(STOP_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE) %>%
+       filter(SUSPECT_BODY_BUILD_TYPE %in% c("HEA", "THN"), STOP_DURATION_MINUTES<=50)
+
+
+mean_stopt_by_body <- sample_body_stopt %>%
+       group_by(SUSPECT_BODY_BUILD_TYPE) %>%
+       summarize(mean_stopt = mean(STOP_DURATION_MINUTES, na.rm=TRUE))
+print(mean_stopt_by_body)
+
+
+
+ggplot(sample_body_stopt, aes(STOP_DURATION_MINUTES, SUSPECT_BODY_BUILD_TYPE)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Stop Time by Body Build Type")
+
+
+t.test(STOP_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_stopt, equal.var=FALSE)
+
+# The p-value is much higher this time. Thus, we are rejecting the null hypothesis.
+```
+
+```{r}
+### Comparison of Means T-test 5: mean observed duration time of male suspects and female suspects (sex)
+
+unique(NYPD$SUSPECT_SEX)
+table(NYPD$SUSPECT_SEX) # Male suspects are far more than female suspects.
+
+# We will use all the data to conduct the test first, and then we do again without outliers(observed mins >35)
+
+## subset the vectors that we are going to do the t-test
+all_sample_sex_observet <- NYPD %>%
+       select(OBSERVED_DURATION_MINUTES, SUSPECT_SEX) %>%
+       filter(SUSPECT_SEX %in% c("MALE", "FEMALE"))
+
+
+## Calculate the mean observed time by body build type
+all_mean_observet_by_sex <- all_sample_sex_observet %>%
+       group_by(SUSPECT_SEX) %>%
+       summarize(all_mean_observet = mean(OBSERVED_DURATION_MINUTES, na.rm=TRUE))
+print(all_mean_observet_by_sex)
+
+
+## Create a comparative box plot of Observed Duration Minutes by Body Build Type
+ggplot(all_sample_sex_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_SEX)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Observed Time by Sex")
+
+
+## Conduct a comparison of means t-test:
+t.test(OBSERVED_DURATION_MINUTES~SUSPECT_SEX, data=all_sample_sex_observet, equal.var=FALSE)
+
+# From the t-test result we see, p-value is still higher than 0.05 which implies there is no statistical significant difference in observed time means of male suspects and female suspects(with all data including outliers). Even though we could see obvious difference in the computed means(Female 6.79 mins, Male 23.30 mins), we cannot conclude the mean observed time is different in these 2 groups.
+
+
+
+
+
+# Then do it again excluding outliers: we use the same method as previously in part 1 to exclude outliers in observed time(>35), which is defined according to context. 
+sample_sex_observet <- NYPD %>%
+       select(OBSERVED_DURATION_MINUTES, SUSPECT_SEX) %>%
+       filter(SUSPECT_SEX %in% c("MALE", "FEMALE"), OBSERVED_DURATION_MINUTES<=35)
+
+
+mean_observet_by_sex <- sample_sex_observet %>%
+       group_by(SUSPECT_SEX) %>%
+       summarize(mean_observet = mean(OBSERVED_DURATION_MINUTES, na.rm=TRUE))
+print(mean_observet_by_sex)
+
+
+
+ggplot(sample_sex_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_SEX)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Observed Time by Sex")
+
+
+t.test(OBSERVED_DURATION_MINUTES~SUSPECT_SEX, data=sample_sex_observet, equal.var=FALSE)
+
+# The p-value is much higher this time, we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
+```
+
+```{r}
+### Comparison of Means T-test 6: mean stop duration time of male suspects and female suspects (sex)
+
+unique(NYPD$SUSPECT_SEX)
+table(NYPD$SUSPECT_SEX) # Male suspects are far more than female suspects.
+
+# We will use all the data to conduct the test first, and then we do again without outliers(stop mins >50)
+
+## subset the vectors that we are going to do the t-test
+all_sample_sex_stopt <- NYPD %>%
+       select(STOP_DURATION_MINUTES, SUSPECT_SEX) %>%
+       filter(SUSPECT_SEX %in% c("MALE", "FEMALE"))
+
+
+## Calculate the mean stop time by body build type
+all_mean_stopt_by_sex <- all_sample_sex_stopt %>%
+       group_by(SUSPECT_SEX) %>%
+       summarize(all_mean_stopt = mean(STOP_DURATION_MINUTES, na.rm=TRUE))
+print(all_mean_stopt_by_sex)
+
+
+## Create a comparative box plot of Stop Duration Minutes by Body Build Type
+ggplot(all_sample_sex_stopt, aes(STOP_DURATION_MINUTES, SUSPECT_SEX)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Stop Time by Sex")
+
+
+## Conduct a comparison of means t-test:
+t.test(STOP_DURATION_MINUTES~SUSPECT_SEX, data=all_sample_sex_stopt, equal.var=FALSE)
+
+# From the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in stop time means of male suspects and female suspects(with all data including outliers).
+
+
+
+
+
+# Then do it again excluding outliers: we use the same method as previously in part 1 to exclude outliers in stop time(>50), which is defined according to context. 
+sample_sex_stopt <- NYPD %>%
+       select(STOP_DURATION_MINUTES, SUSPECT_SEX) %>%
+       filter(SUSPECT_SEX %in% c("MALE", "FEMALE"), STOP_DURATION_MINUTES<=50)
+
+
+mean_stopt_by_sex <- sample_sex_stopt %>%
+       group_by(SUSPECT_SEX) %>%
+       summarize(mean_stopt = mean(STOP_DURATION_MINUTES, na.rm=TRUE))
+print(mean_stopt_by_sex)
+
+
+
+ggplot(sample_sex_stopt, aes(STOP_DURATION_MINUTES, SUSPECT_SEX)) + geom_boxplot(colour = "orange", fill="grey") + ggtitle("Stop Time by Sex")
+
+
+t.test(STOP_DURATION_MINUTES~SUSPECT_SEX, data=sample_sex_stopt, equal.var=FALSE)
+
+# We are still rejecting the null hypothesis because the p-value is higher than 0.05. From the 2 tests above, we could conclude there is no statistical significant difference in stop duration minutes of male and female suspects.
 ```
