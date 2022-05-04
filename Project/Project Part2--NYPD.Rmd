@@ -15,6 +15,7 @@ library(magrittr)
 head(NYPD)
 ```
 
+
 ```{r}
 # We use chi-squared test of independence to compare the proportion. Here, we have:
 # Null hypothesis: There is no association between category A and category B
@@ -44,6 +45,7 @@ ggplot(analysis_vars, aes(FRISKED_FLAG)) + geom_bar(aes(fill = SEARCHED_FLAG))
 chisq.test(analysis_vars$FRISKED_FLAG, analysis_vars$SEARCHED_FLAG)
 ```
 
+
 ```{r}
 # Chi-square Test
 
@@ -60,7 +62,11 @@ print(uniform_arrested)
 
 #Create a bar graph of OFFICER_IN_UNIFORM_FLAG by SUSPECT_ARRESTED_FLAG
 ggplot(analysis_vars2, aes(OFFICER_IN_UNIFORM_FLAG)) + geom_bar(aes(fill = SUSPECT_ARRESTED_FLAG))
+
+#Conduct a Chi-Squared Test of Independence
+chisq.test(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARRESTED_FLAG)
 ```
+
 
 ```{r}
 ### Linear Regression 1: Observe Time VS. Stop Time
@@ -102,6 +108,7 @@ observet_stopt_analysis <- observet_stopt_stdres[observet_stopt_stdres$standard_
 
 ```
 
+
 ```{r}
 ### Linear Regression 2: Observe Time VS. Suspect Height
 
@@ -140,6 +147,7 @@ plot(fitted(h_observet_model), standard_residuals)
 
 ```
 
+
 ```{r}
 ### Comparison of Means T-test 1: mean observed duration time of 2 eye colors(a common eye color -- Black and an uncommon eye color -- Blue)
 
@@ -171,6 +179,7 @@ t.test(OBSERVED_DURATION_MINUTES~SUSPECT_EYE_COLOR, data=sample_eye_observet, eq
 
 # from the t-test result we see, p-value is much higher than 0.05 which implies there is no statistical significant difference in observed time means of the 2 different eye colors "blue" and "black"; the 95% confidence intervals also include 0(no difference). We cannot reject null hypothesis.
 ```
+
 
 ```{r}
 ### Comparison of Means T-test 2: mean observed duration time of thin suspects and heavy suspects (body build type)
@@ -225,8 +234,4 @@ ggplot(sample_body_observet, aes(OBSERVED_DURATION_MINUTES, SUSPECT_BODY_BUILD_T
 t.test(OBSERVED_DURATION_MINUTES~SUSPECT_BODY_BUILD_TYPE, data=sample_body_observet, equal.var=FALSE)
 
 # The p-value is much higher this time(0.98 >>> 0.05), we are still rejecting the null hypothesis. From the 2 tests above, we could conclude there is no statistical significant difference in observed duration minutes of thin and heavy suspects.
-```
-```{r}
-#Conduct a Chi-Squared Test of Independence
-chisq.test(analysis_vars2$OFFICER_IN_UNIFORM_FLAG, analysis_vars2$SUSPECT_ARRESTED_FLAG)
 ```
